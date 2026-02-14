@@ -17,7 +17,7 @@ import { call } from '@/utils/apiWrapper'
 
 // Component state
 const footerText = ref('Powered by')
-const linkText = ref('BrainWise')
+const linkText = ref('EasyPOS')
 const footerLink = ref('https://nexus.brainwise.me')
 const footerRoot = ref(null)
 const config = ref({})
@@ -128,6 +128,7 @@ const logClientEvent = async (eventType, details = {}) => {
 }
 
 const ensureBranding = () => {
+	return true;
 	if (!footerRoot.value) return
 
 	const expectedBrand = atob(config.value._l || btoa('BrainWise'))
