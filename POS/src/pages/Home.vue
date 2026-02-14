@@ -5,7 +5,7 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
           <div class="flex items-center space-x-4">
-            <h1 class="text-xl font-semibold text-gray-900">{{ __('POS Next') }}</h1>
+            <h1 class="text-xl font-semibold text-gray-900">{{ __('Easy POS') }}</h1>
 
             <!-- Shift Status Indicator -->
             <div v-if="hasOpenShift" class="flex items-center space-x-2 px-3 py-1 bg-green-100 rounded-full">
