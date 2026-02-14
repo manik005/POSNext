@@ -50,7 +50,7 @@
         <div class="border-4 border-dashed border-gray-200 rounded-lg min-h-96 p-8">
           <div class="text-center">
             <h2 class="text-2xl font-bold text-gray-900 mb-4">
-              {{ __('Welcome to POS Next!') }}
+              {{ __('Welcome to EasyPOS!') }}
             </h2>
             <p class="text-gray-600 mb-8">
               {{ __('Your point of sale system is ready to use.') }}
@@ -190,7 +190,7 @@
           </div>
 
           <p v-else class="text-sm text-gray-500">
-            {{ __('Are you sure you want to sign out of POS Next?') }}
+            {{ __('Are you sure you want to sign out of EasyPOS?') }}
           </p>
         </div>
       </template>
