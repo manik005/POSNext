@@ -361,27 +361,106 @@
 		<div v-if="items.length > 0" class="px-2 py-2 border-b border-gray-200 bg-white">
 			<div class="flex items-center justify-between mb-1.5">
 				<h2 class="text-xs font-bold text-gray-900">{{ __("Cart Items") }}</h2>
-				<button
-					@click="$emit('clear-cart')"
-					class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors touch-manipulation"
-					type="button"
-					:title="__('Clear all items')"
-				>
-					<svg
-						class="w-4 h-4"
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-						stroke-width="2"
+				<div class="flex items-center gap-1">
+					<!-- Clear Cart Button -->
+					<button
+						@click="$emit('clear-cart')"
+						class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors touch-manipulation"
+						type="button"
+						:title="__('Clear all items')"
 					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V5a2 2 0 00-2-2h-2a2 2 0 00-2 2v2M4 7h16"
-						/>
-					</svg>
-					<span>{{ __("Clear") }}</span>
-				</button>
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V5a2 2 0 00-2-2h-2a2 2 0 00-2 2v2M4 7h16"/>
+						</svg>
+						<span>{{ __("Clear") }}</span>
+					</button>
+					<!-- Sort Dropdown -->
+					<div class="relative" ref="cartSortContainer">
+						<button
+							@click="toggleCartSortDropdown"
+							:class="[
+								'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors touch-manipulation',
+								cartSortBy
+									? 'text-blue-600 hover:bg-blue-50'
+									: 'text-gray-600 hover:bg-gray-50'
+							]"
+							:title="cartSortBy
+								? (cartSortOrder === 'asc'
+									? __('Sorted by {0} A-Z', [getCartSortLabel()])
+									: __('Sorted by {0} Z-A', [getCartSortLabel()]))
+								: __('Sort cart items')"
+							:aria-label="__('Sort cart items')"
+							type="button"
+						>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+							</svg>
+							<span>{{ __("Sort") }}</span>
+						</button>
+
+						<!-- Sort Dropdown Menu -->
+						<div
+							v-if="showCartSortDropdown"
+							@click.stop
+							class="absolute end-0 mt-1 w-52 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999]"
+						>
+							<div class="py-2">
+								<div class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase border-b border-gray-100">
+									{{ __('Sort Cart') }}
+								</div>
+								<div class="py-1">
+									<!-- No Sorting (clear) -->
+									<button
+										@click="handleCartSortToggle(null)"
+										:class="[
+											'w-full px-3 py-2 text-sm transition-colors flex items-center justify-between group',
+											!cartSortBy ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'
+										]"
+										type="button"
+									>
+										<span class="flex items-center gap-2.5">
+											<svg class="w-4 h-4 text-gray-400 group-hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+											</svg>
+											<span>{{ __('No Sorting') }}</span>
+										</span>
+									</button>
+
+									<div class="h-px bg-gray-100 my-1"></div>
+
+									<!-- Sort Options Loop -->
+									<button
+										v-for="option in CART_SORT_OPTIONS"
+										:key="option.field"
+										@click="handleCartSortToggle(option.field)"
+										:class="[
+											'w-full px-3 py-2 text-sm transition-colors flex items-center justify-between group',
+											cartSortBy === option.field ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'
+										]"
+										type="button"
+									>
+										<span class="flex items-center gap-2.5">
+											<svg class="w-4 h-4 text-gray-400 group-hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="option.icon"/>
+											</svg>
+											<span>{{ option.label }}</span>
+										</span>
+										<!-- Sort direction icon -->
+										<svg
+											class="w-5 h-5"
+											:class="cartSortBy === option.field ? 'text-blue-600' : 'text-gray-300'"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="CART_SORT_ICONS[getCartSortIconState(option.field)]"/>
+										</svg>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 
 			<!-- Offers & Coupon Buttons -->
@@ -663,8 +742,8 @@
 
 			<div v-else class="flex flex-col gap-0.5 sm:gap-1">
 				<div
-					v-for="(item, index) in items"
-					:key="index"
+					v-for="(item, index) in sortedItems"
+					:key="item.item_code + '-' + (item.uom || '')"
 					@click="openEditDialog(item)"
 					class="bg-white border border-gray-200 rounded-md p-1.5 sm:p-2 hover:border-blue-300 hover:shadow-md transition-all duration-200 active:scale-[0.99] cursor-pointer group"
 				>
@@ -852,7 +931,7 @@
 											inputmode="decimal"
 											:disabled="item.is_resolved_barcode"
 											:class="[
-												'w-14 sm:w-16 h-6 sm:h-7 text-center border-0 text-xs sm:text-sm font-bold focus:outline-none',
+												'w-16 sm:w-20 h-6 sm:h-7 text-center border-0 text-xs sm:text-sm font-bold focus:outline-none',
 												item.is_resolved_barcode
 													? 'bg-amber-50 text-amber-700 cursor-not-allowed'
 													: 'bg-white text-gray-900 focus:ring-2 focus:ring-blue-500'
@@ -1167,6 +1246,7 @@ import { usePOSOffersStore } from "@/stores/posOffers";
 import { useCustomerSearchStore } from "@/stores/customerSearch";
 import { DEFAULT_CURRENCY, formatCurrency as formatCurrencyUtil } from "@/utils/currency";
 import { useFormatters } from "@/composables/useFormatters";
+import { useCartSort } from "@/composables/useCartSort";
 import { isOffline } from "@/utils/offline";
 import { offlineWorker } from "@/utils/offline/workerClient";
 import { logger } from "@/utils/logger";
@@ -1273,6 +1353,14 @@ const emit = defineEmits([
 	// "create-sales-order", // () - Create Sales Order // Removed as per instruction
 ]);
 
+// Cart sort composable (must be after defineProps)
+const {
+	cartSortBy, cartSortOrder, showCartSortDropdown,
+	sortedItems,
+	CART_SORT_OPTIONS, CART_SORT_ICONS,
+	toggleCartSortDropdown, handleCartSortToggle, getCartSortLabel, getCartSortIconState,
+} = useCartSort(() => props.items);
+
 /**
  * ============================================================================
  * REACTIVE STATE
@@ -1295,6 +1383,9 @@ const selectedItem = ref(null); // Item being edited
 
 // UOM dropdown state - tracks which item's UOM dropdown is open (by item_code)
 const openUomDropdown = ref(null);
+
+// Cart sort dropdown container (template ref for outside-click detection)
+const cartSortContainer = ref(null);
 
 /**
  * ============================================================================
@@ -1403,18 +1494,17 @@ const customerResults = computed(() => {
 	if (searchValue.length < 2) {
 		if (customerSearchFocused.value) {
 			// Get frequent customer IDs from the store
-			const frequentIds = customerSearchStore.frequentCustomers.slice(0, 5);
-			if (frequentIds.length > 0) {
-				// O(1) lookup using pre-computed map instead of O(n) find
-				const frequentCustomers = [];
-				for (const id of frequentIds) {
-					const cust = customerMap.value.get(id);
-					if (cust) frequentCustomers.push(cust);
-				}
-				return frequentCustomers;
-			}
+			// const frequentIds = customerSearchStore.frequentCustomers.slice(0, 5);
+			// if (frequentIds.length > 0) {
+			// 	const frequentCustomers = [];
+			// 	for (const id of frequentIds) {
+			// 		const cust = customerMap.value.get(id);
+			// 		if (cust) frequentCustomers.push(cust);
+			// 	}
+			// 	return frequentCustomers;
+			// }
 			// If no frequent customers, show first 5 from the list
-			return allCustomers.value.slice(0, 5);
+			return allCustomers.value.slice(0, 10);
 		}
 		return [];
 	}
@@ -1632,12 +1722,15 @@ function createNewCustomer() {
  * @returns {String} 2-letter initials (uppercase)
  */
 function getInitials(name) {
-	if (!name) return "?";
-	const parts = name.split(" ");
+	if (!name || !name.trim()) return "?";
+	const parts = name.trim().split(/\s+/).filter(Boolean);
+	if (parts.length === 0) return "?";
+	const first = Array.from(parts[0])[0] || "?";
 	if (parts.length >= 2) {
-		return (parts[0][0] + parts[1][0]).toUpperCase();
+		const second = Array.from(parts[1])[0] || "?";
+		return (first + second).toUpperCase();
 	}
-	return name.substring(0, 2).toUpperCase();
+	return Array.from(parts[0]).slice(0, 2).join("").toUpperCase();
 }
 
 /**
@@ -1845,6 +1938,7 @@ function selectDocType(type) {
  * Handle clicks outside interactive elements.
  * - Closes customer search dropdown when clicking outside
  * - Closes UOM dropdown when clicking outside
+ * - Closes cart sort dropdown when clicking outside
  *
  * @param {MouseEvent} event - Click event
  */
@@ -1874,6 +1968,16 @@ function handleOutsideClick(event) {
 		if (!clickedInsideUomDropdown) {
 			openUomDropdown.value = null;
 		}
+	}
+
+	// Close cart sort dropdown if clicking outside
+	if (
+		showCartSortDropdown.value &&
+		cartSortContainer.value &&
+		target instanceof Node &&
+		!cartSortContainer.value.contains(target)
+	) {
+		showCartSortDropdown.value = false;
 	}
 }
 
