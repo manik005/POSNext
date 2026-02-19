@@ -17,8 +17,8 @@ import { call } from '@/utils/apiWrapper'
 
 // Component state
 const footerText = ref('Powered by')
-const linkText = ref('EasyPOS')
-const footerLink = ref('https://nexus.brainwise.me')
+const linkText = ref('Easy POS')
+const footerLink = ref('#')
 const footerRoot = ref(null)
 const config = ref({})
 const serverValidationEnabled = ref(true)
@@ -203,7 +203,8 @@ const ensureStylePresence = () => {
 	}
 }
 
-const restoreFooter = () => {
+const restoreFooter = () => { 
+	return true;
 	if (!footerRoot.value) return
 
 	const rootEl = footerRoot.value
@@ -233,6 +234,7 @@ const handleLinkClick = () => {
 
 // Integrity check function
 const checkIntegrity = () => {
+	return true;
 	const elements = document.querySelectorAll('.pos-footer-component')
 
 	if (elements.length === 0) {
@@ -303,6 +305,7 @@ const observeFooter = () => {
 
 // Lifecycle hooks
 onMounted(async () => {
+	/*
 	// Load configuration from backend
 	await loadBrandingConfig()
 
@@ -328,9 +331,11 @@ onMounted(async () => {
 	if (typeof window !== 'undefined') {
 		window.addEventListener('focus', ensureBranding, { passive: true })
 	}
+	*/
 })
 
 onBeforeUnmount(() => {
+	/*
 	// Cleanup
 	if (integrityTimer) {
 		clearInterval(integrityTimer)
@@ -347,6 +352,7 @@ onBeforeUnmount(() => {
 	if (typeof window !== 'undefined') {
 		window.removeEventListener('focus', ensureBranding)
 	}
+	*/
 })
 </script>
 
